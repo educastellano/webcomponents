@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Web Components • Framework Agnostic Demo</title>
+		<script src="bower_components/platform/platform.js"></script>
+		<!-- app -->
+		<!-- <link rel="import" href="elements/my-button.html"> --> 
+		<script src="elements/my-button.js"></script>
+		<script src="elements/x-foo.js"></script>
+		<!-- styles -->
+		<link rel="stylesheet" href="app/app.css">
+	</head>
+	<body>
+		<header id="header">
+			<h1>Web Components • Framework Agnostic Demo</h1>
+		</header>
+		<section id="app">
+			<button is="my-button">My Button</button>
+			<x-foo></x-foo>
+		</section>
+		<footer id="info">
+			<p>Footer</p>
+		</footer>
+	</body>
+</html>

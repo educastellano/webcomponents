@@ -1,0 +1,18 @@
+(function () {
+	'use strict';
+
+	var Element = Object.create(HTMLElement.prototype);
+	
+	Element.createdCallback = function() {
+	  this.textContent = "I'm an x-foo!";
+	};
+	
+	Element.foo = function() {
+	  console.log('foo() called');
+	};
+
+	document.registerElement('x-foo', {
+	  prototype: Element
+	});
+
+})();
