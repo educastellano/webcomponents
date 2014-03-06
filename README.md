@@ -1,4 +1,4 @@
 webcomponents
 =============
 
-Playing around with the Web Components Standard
+Playing around with Web Components
