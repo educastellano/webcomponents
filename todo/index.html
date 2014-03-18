@@ -6,7 +6,8 @@
 		<link rel="stylesheet" href="app/app.css">
 		<!--<link rel="import" href="lib-elements/polymer-localstorage.html">-->
 		<!--<link rel="import" href="elements/td-model.html">-->
-		<link rel="import" href="elements/td-todos.html">
+		<!-- <link rel="import" href="elements/td-todos.html"> -->
+		<link rel="import" href="elements/td-item.html">
 		<!-- <link rel="import" href="elements/td-input.html"> -->
 	</head>
 	<body>
@@ -16,8 +17,8 @@
 			</header>
 			<!--<polymer-localstorage id="storage" name="todos-polymer"></polymer-localstorage>-->
 			<!--<td-model id="model" storageId="storage"></td-model>-->
-			<td-todos modelId="model"></td-todos>
-			
+			<!-- <td-todos modelId="model"></td-todos> -->
+			<td-item></td-item>
 			<!-- <input is="td-input" id="new-todo" placeholder="What needs to be done?" autofocus on-td-input-commit="addTodoAction" on-td-input-cancel="cancelAddTodoAction"> -->
 		</section>
 		<footer id="info">
@@ -30,7 +31,7 @@
 		<script src="bower_components/platform/platform.js"></script>
 		<script>
 			window.addEventListener('HTMLImportsLoaded', function(e) {
-								debugger;
+								return;
 				// http://www.html5rocks.com/en/tutorials/webcomponents/imports/#include-templates
 				//
 				var links = document.querySelectorAll('link[rel="import"]'),
