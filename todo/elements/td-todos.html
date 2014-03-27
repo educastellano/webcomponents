@@ -1,131 +1,100 @@
-<!--<link rel="import" href="../lib-elements/polymer-selector.html">
-<link rel="import" href="../lib-elements/flatiron-director.html">
 <link rel="import" href="td-input.html">
 <link rel="import" href="td-item.html">
--->
-<!--<polymer-element name="td-todos" attributes="route modelId">-->
-<link rel="import" href="td-input.html">
-<template for-element="td-todos">
-	<link rel="stylesheet" href="td-todos.css">
-	<!--<flatiron-director route="{{route}}"></flatiron-director>-->
-	<section id="todoapp">
-		<header id="header">
-			<input is="td-input" id="new-todo" placeholder="What needs to be done?" autofocus on-td-input-commit="addTodoAction" on-td-input-cancel="cancelAddTodoAction">
-		</header>
-		<!--
-		<section id="main" hidden?="{{model.items.length == 0}}">
-			<input id="toggle-all" type="checkbox" on-change="toggleAllCompletedAction" checked="{{model.allCompleted}}">
-			<label for="toggle-all">Mark all as complete</label>
-			<ul id="todo-list" on-td-item-changed="itemChangedAction" on-td-destroy-item="destroyItemAction">
-				<template repeat="{{model.filtered}}">
-					<li is="td-item" item="{{}}"></li>
-				</template>
-			</ul>
-		</section>
-		<footer id="footer" hidden?="{{model.items.length == 0}}">
-			<span id="todo-count"><strong>{{model.activeCount}}</strong> {{model.activeCount == 1 ? 'item' : 'items'}} left</span>
-			<polymer-selector id="filters" selected="{{route || 'all'}}">
-				<li name="all">
-					<a href="../#/">All</a>
-				</li>
-				<li name="active">
-					<a href="../#/active">Active</a>
-				</li>
-				<li name="completed">
-					<a href="../#/completed">Completed</a>
-				</li>
-			</polymer-selector>
-			<button hidden?="{{model.completedCount == 0}}" id="clear-completed" on-click="clearCompletedAction">Clear completed ({{model.completedCount}})</button>
-		</footer>
-		-->
-	</section>
-
-
+<link rel="stylesheet" href="td-todos.css">
 <script>
-(function () {
-	'use strict';
+	(function() {
+		// Element Prototype
+		//
+		var proto = Object.create(HTMLElement.prototype, {
+			createdCallback: {
+				value: function () {
+					this.$ = {};
+					this.list = [];
+					// create inner elements
+					this.$.todoapp = document.createElement('section');
+					this.$.header = document.createElement('header');
+					this.$.main = document.createElement('section');
+					this.$.footer = document.createElement('footer');
+					this.$.newtodo = document.createElement('input', 'td-input');
+					this.$.todolist = document.createElement('ul');
+					// attributes
+					this.$.newtodo.id = 'new-todo';
+					this.$.header.id = 'header';
+					this.$.main.id = 'main';
+					this.$.footer.id = 'footer';
+					this.$.todolist.id = 'todo-list';
+					// events
+					this.$.newtodo.addEventListener('td-input-commit', this.addTodo.bind(this));
+					this.$.newtodo.addEventListener('td-input-cancel', this.cancelAddTodo.bind(this));
+					// appends
+					this.$.todoapp.appendChild(this.$.header);
+					this.$.todoapp.appendChild(this.$.main);
+					this.$.todoapp.appendChild(this.$.footer);
+					this.$.header.appendChild(this.$.newtodo);
+					this.$.main.appendChild(this.$.todolist);
+					this.appendChild(this.$.todoapp);
+					// default attributes
 
-	// element prototype
-	//
-	var proto = Object.create(HTMLElement.prototype, {
-		createdCallback: {
-			value: function () {
-				debugger;
-				var input = this.querySelector('#new-todo');
-				input.addEventListener('td-input-commit', this.addTodo);
-				input.addEventListener('td-input-cancel', this.cancelAddTodo);
+					//
+					this.bindData();
+				}
+			},	
+			bindData: {
+				value: function () {
+					var me = this;;
+
+					Object.observe(this.list, function (recs) {
+						var i,
+							rec,
+							idx;
+						for (i=0; rec = recs[i]; i++) {
+							if (!isNaN(idx = parseInt(rec.name))) {
+								switch (rec.type) {
+									case 'add':
+										var tditem = document.createElement('li', 'td-item');
+										tditem.item = rec.object[idx]
+										me.$.todolist.appendChild(tditem);
+										break;
+									case 'delete':
+										console.log('delete <td-item>')
+										break;
+									default:
+										break;
+								}
+							}
+						}
+					}, ['add', 'delete']);
+				}
+			},
+			//
+			// Attributes
+			//
+
+			//
+			// Methods
+			//
+			addTodo: {
+				value: function () {
+					if (this.$.newtodo.value) {
+						this.list.push({
+							title: this.$.newtodo.value,
+							completed: false
+						});
+						this.$.newtodo.value = '';
+					}					
+				}
+			},
+			cancelAddTodo: {
+				value: function () {
+					this.$.newtodo.value = '';
+				}
 			}
-		},
+		});
 
-		addTodo: {
-			value: function () {
-				console.log('add todo!')
-			}
-		},
-
-		cancelAddTodo: {
-			value: function () {
-				var input = document.querySelector('#new-todo');
-				input.value = '';
-			}
-		}
-	});
-
-	// Private methods
-	//
-
-
-
-	// register element
-	//
-	document.registerElement('td-todos', {
-		prototype: proto
-	});
-
-	window.td_todos_created = true;
-
-})();
-
-
-
-
-		// (function () {
-			// var ENTER_KEY = 13;
-			// var ESC_KEY = 27;
-			// Polymer('td-todos', {
-			// 	modelIdChanged: function () {
-			// 		this.model = document.querySelector('#' + this.modelId);
-			// 	},
-			// 	routeChanged: function () {
-			// 		if (this.model) {
-			// 			this.model.filter = this.route;
-			// 		}
-			// 	},
-			// 	addTodoAction: function () {
-			// 		this.model.newItem(this.$['new-todo'].value);
-			// 		// when polyfilling Object.observe, make sure we update immediately
-			// 		Platform.flush();
-			// 		this.$['new-todo'].value = '';
-			// 	},
-			// 	cancelAddTodoAction: function () {
-			// 		this.$['new-todo'].value = '';
-			// 	},
-			// 	itemChangedAction: function () {
-			// 		if (this.model) {
-			// 			this.model.itemsChanged();
-			// 		}
-			// 	},
-			// 	destroyItemAction: function (e, detail) {
-			// 		this.model.destroyItem(detail);
-			// 	},
-			// 	toggleAllCompletedAction: function (e, detail, sender) {
-			// 		this.model.setItemsCompleted(sender.checked);
-			// 	},
-			// 	clearCompletedAction: function () {
-			// 		this.model.clearItems();
-			// 	}
-			// });
-		// })();
+		// register element
+		//
+		document.registerElement('td-todos', {
+		  	prototype: proto
+		});
+	})();
 </script>
-</template>
-

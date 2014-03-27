@@ -7,21 +7,22 @@
 		
 		// Element Prototype
 		//
-		var proto = Object.create(HTMLElement.prototype, {
+		var proto = Object.create(HTMLLIElement.prototype, {
 			createdCallback: {
 				value: function () {
+					this.$ = {};
 					// create inner elements
 					this.$.view = document.createElement('div');
 					this.$.checked = document.createElement('input');
 					this.$.label = document.createElement('label');
 					this.$.destroy = document.createElement('button');
-					this.$.edit = document.createElement('input');
+					this.$.edit = document.createElement('input', 'td-input');
 					// attributes
 					this.$.view.classList.add('view');
 					this.$.checked.type = 'checkbox';
 					this.$.checked.classList.add('toggle')
 					this.$.destroy.classList.add('destroy');
-					this.$.edit.setAttribute('is', 'td-input');
+					this.$.edit.id = 'edit';
 					this.$.edit.classList.add('edit');
 					// events
 					this.$.view.addEventListener('dblclick', this.edit.bind(this));
@@ -45,9 +46,6 @@
 					// this.appendChild(content);
 				}
 			},
-			$: {
-				value: {}
-			},
 			//
 			// Attributes
 			//
@@ -62,11 +60,43 @@
 			item: {
 				get: function () { return this._item; },
 				set: function (item) {
+					var notifier; 
+					if (this._item) {
+						Object.unobserve(this._item, this.itemChange);
+					}
 					this._item = item;
-					// TODO observe the item properties....
-					this.$.view.classList.toggle('completed', item.completed);
-					this.$.label.innerText = item.title;
-					this.$.edit.checked = item.completed;
+					Object.observe(item, this.itemChange.bind(this));
+					notifier = Object.getNotifier(item);
+					notifier.notify({	
+						type: 'update',
+						name: 'title'
+					});
+					notifier.notify({	
+						type: 'completed',
+						name: 'title'
+					});
+				}
+			},
+			//
+			//
+			//
+			itemChange: {
+				value: function (changes) {
+					var item;
+					if (changes.length) {
+						item = changes[0].object;
+						switch (changes[0].name) {
+							case 'title':
+								this.$.label.innerText = item.title;
+								break;
+							case 'completed':
+								this.$.view.classList.toggle('completed', item.completed);
+								this.$.edit.checked = item.completed;
+								break;
+							default:
+								break;
+						}							
+					}
 				}
 			},
 			//
@@ -111,6 +141,7 @@
 		// register element
 		//
 		document.registerElement('td-item', {
+			extends: 'li',
 		  	prototype: proto
 		});
 	})();
